@@ -1,0 +1,80 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "version": { "type": "string" },
+      "author": { "type": "string" },
+      "entry": { "type": "string" },
+      "description": { "type": "string" },
+      "repo": { "type": "string" },
+      "sdk": {
+        "type": "object",
+        "properties": {
+          "version": { "type": "string" }
+        },
+        "required": ["version"]
+      },
+      "software": {
+        "type": "object",
+        "properties": {
+          "minimumVersion": { "type": "string" }
+        },
+        "required": ["minimumVersion"]
+      },
+      "os": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "platform": { "type": "string" },
+            "minimumVersion": { "type": "string" }
+          },
+          "required": ["platform", "minimumVersion"]
+        }
+      },
+      "keyLibrary": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "style": {
+            "type": "object",
+            "properties": {
+              "icon": { "type": "string" }
+            },
+            "required": ["icon"]
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "id": { "type": "string" },
+                "style": {
+                  "type": "object",
+                  "properties": {
+                    "icon": { "type": "string" },
+                    "width": { "type": "integer" }
+                  },
+                  "required": ["icon", "width"]
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "path": { "type": "string" },
+                    "win": { "type": "string" }
+                  }
+                }
+              },
+              "required": ["title", "style", "data"]
+            }
+          }
+        },
+        "required": ["title", "style"]
+      },
+      "uuid": { "type": "string" }
+    },
+    "required": ["name", "version", "author", "entry", "description", "sdk", "software", "os", "keyLibrary", "uuid"]
+  }
+  

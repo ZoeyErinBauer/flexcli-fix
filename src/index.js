@@ -8,6 +8,7 @@ import restartCommand from './commands/restart.js';
 import unlinkCommand from './commands/unlink.js';
 import debugCommand from './commands/debug.js';
 import listCommand from './commands/list.js';
+import packCommand from './commands/pack.js';
 import logger from './utils/logger.js';
 
 const program = new Command();
@@ -97,6 +98,19 @@ plugin
       wsClient.close();
     } catch (error) {
       logger.error(`Error executing list command: ${error.message}`);
+    }
+  });
+
+  plugin
+  .command('pack')
+  .description('Pack a plugin')
+  .requiredOption('--path <path>', 'Path to the plugin directory')
+  .action(async (options) => {
+    try {
+      const port = program.opts().port;
+      await packCommand(null, options);
+    } catch (error) {
+      logger.error(`Error executing pack command: ${error.message}`);
     }
   });
 
