@@ -9,6 +9,8 @@ import unlinkCommand from './commands/unlink.js';
 import debugCommand from './commands/debug.js';
 import listCommand from './commands/list.js';
 import packCommand from './commands/pack.js';
+import installCommand from './commands/install.js';
+import uninstallCommand from './commands/uninstall.js';
 import logger from './utils/logger.js';
 
 const program = new Command();
@@ -111,6 +113,42 @@ plugin
       await packCommand(null, options);
     } catch (error) {
       logger.error(`Error executing pack command: ${error.message}`);
+    }
+  });
+
+  plugin
+  .command('install')
+  .description('Install a plugin')
+  .requiredOption('--path <path>', 'Path to the .flexplugin file')
+  .action(async (options) => {
+    try {
+      if (!options.path.endsWith('.flexplugin')) {
+        logger.error('Invalid file extension. Please provide a .flexplugin file.');
+        return;
+      }
+      const port = program.opts().port;
+      const wsClient = new WebSocketClient(port);
+      await wsClient.connect();
+      await installCommand(wsClient, options);
+      wsClient.close();
+    } catch (error) {
+      logger.error(`Error executing install command: ${error.message}`);
+    }
+  });
+
+  plugin
+  .command('uninstall')
+  .description('Uninstall a plugin')
+  .requiredOption('--uuid <uuid>', 'Plugin UUID')
+  .action(async (options) => {
+    try {
+      const port = program.opts().port;
+      const wsClient = new WebSocketClient(port);
+      await wsClient.connect();
+      await uninstallCommand(wsClient, options);
+      wsClient.close();
+    } catch (error) {
+      logger.error(`Error executing uninstall command: ${error.message}`);
     }
   });
 
