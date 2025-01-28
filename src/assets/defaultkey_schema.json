@@ -1,0 +1,61 @@
+{
+    "type": "object",
+    "required": [
+      "title",
+      "cid",
+      "config",
+      "style",
+      "data"
+    ],
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "cid": {
+        "type": "string"
+      },
+      "config": {
+        "type": "object",
+        "required": [
+          "keyType",
+          "clickable"
+        ],
+        "properties": {
+          "keyType": {
+            "type": "string",
+            "enum": ["default"]
+          },
+          "clickable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "style": {
+        "type": "object",
+        "required": [
+          "icon",
+          "width"
+        ],
+        "properties": {
+          "icon": {
+            "type": "string"
+          },
+          "width": {
+            "type": "number"
+          }
+        }
+      },
+      "data": {
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+  

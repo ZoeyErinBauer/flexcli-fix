@@ -50,7 +50,7 @@
               "type": "object",
               "properties": {
                 "title": { "type": "string" },
-                "id": { "type": "string" },
+                "cid": { "type": "string" },
                 "style": {
                   "type": "object",
                   "properties": {
@@ -67,7 +67,7 @@
                   }
                 }
               },
-              "required": ["title", "style", "data"]
+              "required": ["title", "cid", "style", "data"]
             }
           }
         },

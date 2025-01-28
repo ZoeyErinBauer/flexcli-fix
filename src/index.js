@@ -11,6 +11,7 @@ import listCommand from './commands/list.js';
 import packCommand from './commands/pack.js';
 import installCommand from './commands/install.js';
 import uninstallCommand from './commands/uninstall.js';
+import validateCommand from './commands/validate.js';
 import logger from './utils/logger.js';
 
 const program = new Command();
@@ -28,11 +29,15 @@ plugin
   .requiredOption('--path <path>', 'Path to the folder')
   .requiredOption('--uuid <uuid>', 'UUID string')
   .option('--debug <debug>', 'Debug mode (true/false)', 'false')
+  .option('--skip-validate', 'Skip validation', false)
   .action(async (options) => {
     try {
       const port = program.opts().port;
       const wsClient = new WebSocketClient(port);
       await wsClient.connect();
+      if (!options.skipValidate) {
+        await validateCommand(null, { path: options.path });
+      }
       await linkCommand(wsClient, options);
       wsClient.close();
     } catch (error) {
@@ -107,9 +112,13 @@ plugin
   .command('pack')
   .description('Pack a plugin')
   .requiredOption('--path <path>', 'Path to the plugin directory')
+  .option('--skip-validate', 'Skip validation', false)
   .action(async (options) => {
     try {
       const port = program.opts().port;
+      if (!options.skipValidate) {
+        await validateCommand(null, options);
+      }
       await packCommand(null, options);
     } catch (error) {
       logger.error(`Error executing pack command: ${error.message}`);
@@ -149,6 +158,18 @@ plugin
       wsClient.close();
     } catch (error) {
       logger.error(`Error executing uninstall command: ${error.message}`);
+    }
+  });
+
+  plugin
+  .command('validate')
+  .description('Validate plugin structure and manifest')
+  .requiredOption('--path <path>', 'Path to the plugin directory')
+  .action(async (options) => {
+    try {
+      await validateCommand(null, options);
+    } catch (error) {
+      logger.error(`Error executing validate command: ${error.message}`);
     }
   });
 

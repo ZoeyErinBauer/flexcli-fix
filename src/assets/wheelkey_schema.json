@@ -1,0 +1,62 @@
+{
+  "type": "object",
+  "required": [
+    "title",
+    "cid",
+    "config",
+    "style",
+    "data"
+  ],
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "cid": {
+      "type": "string"
+    },
+    "config": {
+      "type": "object",
+      "required": [
+        "keyType"
+      ],
+      "properties": {
+        "keyType": {
+          "type": "string",
+          "enum": ["wheel"]
+        }
+      }
+    },
+    "style": {
+      "type": "object",
+      "required": [
+        "icon",
+        "width",
+        "wheel"
+      ],
+      "properties": {
+        "icon": {
+          "type": "string"
+        },
+        "width": {
+          "type": "number"
+        },
+        "wheel": {
+          "type": "object",
+          "required": [
+            "step"
+          ],
+          "properties": {
+            "step": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 10
+            }
+          }
+        }
+      }
+    },
+    "data": {
+      "type": "object"
+    }
+  }
+}
