@@ -19,7 +19,7 @@ export default async function unlinkCommand(wsClient, options) {
     if (options.silent) {
       return;
     }
-    if (response.payload.result === 'success') {
+    if (response.status === 'success') {
       logger.info(`Unlink command successful: ${JSON.stringify(response, null, 2)}`);
     } else {
       logger.error(`Unlink command failed: ${JSON.stringify(response, null, 2)}`);

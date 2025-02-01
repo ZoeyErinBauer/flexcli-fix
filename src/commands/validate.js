@@ -19,6 +19,7 @@ export default async function validateCommand(wsClient, options) {
   // 1. Check required files and directories
   const backendJs = path.join(fullPath, 'backend', 'plugin.js');
   const uiDir = path.join(fullPath, 'ui');
+  const resourcesDir = path.join(fullPath, 'resources');
   const manifestFile = path.join(fullPath, 'manifest.json');
 
   if (!fs.existsSync(backendJs)) {
@@ -31,6 +32,10 @@ export default async function validateCommand(wsClient, options) {
   }
   if (!fs.existsSync(manifestFile)) {
     logger.error(`Missing file: ${manifestFile}`);
+    return false;
+  }
+  if (!fs.existsSync(resourcesDir)) {
+    logger.error(`Missing folder: ${resourcesDir}`);
     return false;
   }
 

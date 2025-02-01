@@ -15,7 +15,7 @@ export default async function uninstallCommand(wsClient, options) {
 
   try {
     const response = await wsClient.sendCommand(cmd);
-    if (response.payload.result === 'success') {
+    if (response.status === 'success') {
       logger.info(`Uninstall command successful: ${JSON.stringify(response, null, 2)}`);
     } else {
       logger.error(`Uninstall command failed: ${JSON.stringify(response, null, 2)}`);

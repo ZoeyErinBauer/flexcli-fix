@@ -30,6 +30,8 @@ plugin
   .requiredOption('--uuid <uuid>', 'UUID string')
   .option('--debug <debug>', 'Debug mode (true/false)', 'false')
   .option('--skip-validate', 'Skip validation', false)
+  .option('--force', 'Override existed plugin', false)
+  .option('--start <start>', 'Start the plugin after linking', 'true')
   .action(async (options) => {
     try {
       const port = program.opts().port;
@@ -112,6 +114,7 @@ plugin
   .command('pack')
   .description('Pack a plugin')
   .requiredOption('--path <path>', 'Path to the plugin directory')
+  .option('--output <output>', 'Output path for the .flexplugin file')
   .option('--skip-validate', 'Skip validation', false)
   .action(async (options) => {
     try {
@@ -129,6 +132,7 @@ plugin
   .command('install')
   .description('Install a plugin')
   .requiredOption('--path <path>', 'Path to the .flexplugin file')
+  .option('--force', 'Force install', false)
   .action(async (options) => {
     try {
       if (!options.path.endsWith('.flexplugin')) {

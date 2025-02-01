@@ -13,7 +13,7 @@ export default async function listCommand(wsClient) {
 
   try {
     const response = await wsClient.sendCommand(cmd);
-    if (response.payload.result === 'success') {
+    if (response.status === 'success') {
       logger.info(`List command successful: ${JSON.stringify(response, null, 2)}`);
     } else {
       logger.error(`List command failed: ${JSON.stringify(response, null, 2)}`);

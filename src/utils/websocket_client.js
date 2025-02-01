@@ -72,7 +72,7 @@ export default class WebSocketClient {
           this.responseHandlers.delete(uuid);
           reject(error);
         } else {
-          logger.info(`Sent command: ${payload} with UUID: ${uuid}`);
+          logger.info(`Sent command: ${JSON.stringify(payload)} with UUID: ${uuid}`);
         }
       });
 

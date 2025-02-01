@@ -21,6 +21,6 @@ export default async function debugCommand(wsClient, options) {
   wsClient.ws.removeAllListeners('message');
 
   wsClient.ws.on('message', (message) => {
-    console.log(message.toString())
+    logger.info(`Debugging at: ${message}`);
   });
 }

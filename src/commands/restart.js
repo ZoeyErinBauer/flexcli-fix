@@ -16,7 +16,7 @@ export default async function restartCommand(wsClient, options) {
 
   try {
     const response = await wsClient.sendCommand(cmd);
-    if (response.payload.result === 'success') {
+    if (response.status === 'success') {
       logger.info(`Restart command successful: ${JSON.stringify(response, null, 2)}`);
     } else {
       logger.error(`Restart command failed: ${JSON.stringify(response, null, 2)}`);

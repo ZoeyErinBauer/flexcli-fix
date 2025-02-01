@@ -13,11 +13,12 @@ export default async function installCommand(wsClient, options) {
     cmd: 'plugin',
     operation: 'install',
     path: pluginPath,
+    force: options.force,
   }
 
   try {
     const response = await wsClient.sendCommand(cmd);
-    if (response.payload.result === 'success') {
+    if (response.status === 'success') {
       logger.info(`Install command successful: ${JSON.stringify(response, null, 2)}`);
     } else {
       logger.error(`Install command failed: ${JSON.stringify(response, null, 2)}`);
