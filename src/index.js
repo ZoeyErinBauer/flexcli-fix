@@ -3,6 +3,9 @@
 // index.js
 import { Command } from 'commander';
 import WebSocketClient from './utils/websocket_client.js';
+import inquirer from 'inquirer';
+import logger from './utils/logger.js';
+
 import linkCommand from './commands/link.js';
 import restartCommand from './commands/restart.js';
 import unlinkCommand from './commands/unlink.js';
@@ -12,7 +15,7 @@ import packCommand from './commands/pack.js';
 import installCommand from './commands/install.js';
 import uninstallCommand from './commands/uninstall.js';
 import validateCommand from './commands/validate.js';
-import logger from './utils/logger.js';
+import createCommand from './commands/create.js';
 
 const program = new Command();
 
@@ -176,5 +179,96 @@ plugin
       logger.error(`Error executing validate command: ${error.message}`);
     }
   });
+
+  plugin
+  .command('create')
+  .description('Create a basic plugin workspace')
+  .action(async () => {
+    try {
+      const answers = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'pluginPath',
+          message: 'Plugin path:',
+          default: '.'
+        },
+        {
+          type: 'input',
+          name: 'name',
+          message: 'Plugin name (e.g. "My Plugin"):',
+          default: 'My Plugin'
+        },
+        {
+          type: 'input',
+          name: 'author',
+          message: 'Author (e.g. "Author"):',
+          default: 'Author'
+        },
+        {
+          type: 'input',
+          name: 'uuid',
+          message: 'Reversed domain UUID (e.g. "com.author.myplugin"):',
+          default: (ans) => {
+            const sanitizedAuthor = ans.author.replace(/\s+/g, '_').replace(/[^a-zA-Z_]/g, '');
+            const sanitizedName = ans.name.replace(/\s+/g, '_').replace(/[^a-zA-Z_]/g, '');
+            return `com.${sanitizedAuthor.toLowerCase()}.${sanitizedName.toLowerCase()}`;
+          },
+          validate: (input) => {
+            // only letters, underscores, and dots are allowed
+            if (!/^[a-zA-Z._]+$/.test(input)) {
+              return 'Invalid UUID. Only letters, underscores, and dots are allowed.';
+            }
+            // not starting with com.
+            if (!input.startsWith('com.')) {
+              return 'Invalid UUID. Must start with "com."';
+            }
+            // must have 3 domains
+            if (input.split('.').length != 3) {
+              return 'Invalid UUID. Must have 3 domains.';
+            }
+            // too long
+            if (input.length > 50) {
+              return 'Invalid UUID. Too long.';
+            }
+            // domain too short
+            for (const domain of input.split('.').slice(1)) {
+              if (domain.length < 2) {
+                return `Invalid UUID. Domain "${domain}" is too short.`;
+              }
+            }
+            return true;
+          }
+        },
+        {
+          type: 'input',
+          name: 'version',
+          message: 'Version (e.g. "1.0.0"):',
+          default: '1.0.0',
+          validate: (input) => {
+            if (!/^\d+\.\d+\.\d+$/.test(input)) {
+              return 'Invalid version. Must be in the format "x.y.z".';
+            }
+            return true;
+          }
+        },
+        {
+          type: 'input',
+          name: 'description',
+          message: 'Description (e.g. "My Plugin Description"):'
+        },
+        {
+          type: 'input',
+          name: 'repo',
+          message: 'Repo (e.g. "https://github.com/ENIAC-Tech/FlexDesigner-SDK"):'
+        }
+      ]);
+
+      await createCommand(answers);
+      logger.info(`Workspace for plugin "${answers.name}" created successfully.`);
+    } catch (error) {
+      logger.error(`Error creating plugin workspace: ${error.message}`);
+    }
+  });
+
 
 program.parse(process.argv);
