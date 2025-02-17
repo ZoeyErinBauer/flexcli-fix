@@ -188,15 +188,17 @@ plugin
       const answers = await inquirer.prompt([
         {
           type: 'input',
-          name: 'pluginPath',
-          message: 'Plugin path:',
-          default: '.'
-        },
-        {
-          type: 'input',
           name: 'name',
           message: 'Plugin name (e.g. "My Plugin"):',
           default: 'My Plugin'
+        },
+        {
+          type: 'input',
+          name: 'pluginPath',
+          message: 'Plugin path:',
+          default: (ans) => {
+            return ans.name
+          }
         },
         {
           type: 'input',

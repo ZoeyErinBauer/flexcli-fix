@@ -10,6 +10,8 @@ import {
   configJsonTemplate,
   pluginJsTemplate
 } from '../assets/templates.js';
+import { exec } from 'child_process';
+import ora from 'ora';
 
 import logger from '../utils/logger.js';
 
@@ -38,9 +40,29 @@ export default async function createCommand(answers) {
     createFile(pluginDir, 'manifest.json', manifestJsonTemplate, { name, author, uuid, version, description, repo });
     createFile(pluginDir, 'config.json', configJsonTemplate);
     createFile(srcDir, 'plugin.js', pluginJsTemplate);
+
+    await installDependencies(baseDir);
   } catch (err) {
     logger.error(`Failed to create workspace: ${err.message}`);
   }
+}
+
+function installDependencies(baseDir) {
+  const spinner = ora('Installing dependencies').start();
+
+
+  return new Promise((resolve, reject) => {
+    exec('npm install', { cwd: baseDir }, (err, stdout, stderr) => {
+      if (err) {
+        logger.error(`Error installing dependencies: ${stderr || err.message}`);
+        reject(err);
+        spinner.fail('Failed to install dependencies');
+        return;
+      }
+      resolve(stdout);
+      spinner.succeed('Dependencies installed');
+    });
+  });
 }
 
 function createFile(basePath, filename, template, data = {}) {
