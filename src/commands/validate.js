@@ -17,25 +17,20 @@ export default async function validateCommand(wsClient, options) {
   const fullPath = path.resolve(pluginPath);
 
   // 1. Check required files and directories
-  const backendJs = path.join(fullPath, 'backend', 'plugin.js');
   const uiDir = path.join(fullPath, 'ui');
   const resourcesDir = path.join(fullPath, 'resources');
   const manifestFile = path.join(fullPath, 'manifest.json');
 
-  if (!fs.existsSync(backendJs)) {
-    logger.error(`Missing file: ${backendJs}`);
-    return false;
-  }
   if (!fs.existsSync(uiDir)) {
-    logger.error(`Missing folder: ${uiDir}`);
+    logger.error(`Missing ui folder: ${uiDir}`);
     return false;
   }
   if (!fs.existsSync(manifestFile)) {
-    logger.error(`Missing file: ${manifestFile}`);
+    logger.error(`Missing manifest file: ${manifestFile}`);
     return false;
   }
   if (!fs.existsSync(resourcesDir)) {
-    logger.error(`Missing folder: ${resourcesDir}`);
+    logger.error(`Missing resources folder: ${resourcesDir}`);
     return false;
   }
 
@@ -54,6 +49,13 @@ export default async function validateCommand(wsClient, options) {
     return false;
   }
 
+  // check if entry exists
+  const backendJs = path.join(fullPath, manifest.entry);
+  if (!fs.existsSync(backendJs)) {
+    logger.error(`Missing entry file: ${backendJs}`);
+    return false;
+  }
+  
   // 3. If manifest contains keyLibrary, validate each key
   if (Array.isArray(manifest.keyLibrary)) {
     try {
