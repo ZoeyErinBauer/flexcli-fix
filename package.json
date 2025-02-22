@@ -1,9 +1,13 @@
 {
-  "name": "flexcli",
+  "name": "@eniac/flexcli",
   "version": "1.0.0",
   "description": "CLI tool for FlexDesigner",
   "bin": {
     "flexcli": "./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ENIAC-Tech/flexcli.git"
   },
   "type": "module",
   "scripts": {
