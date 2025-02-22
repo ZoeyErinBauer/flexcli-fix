@@ -146,7 +146,7 @@ export const manifestJsonTemplate = `{
 export const configJsonTemplate = `{}`;
 
 // 模板：plugin.js
-export const pluginJsTemplate = `const { plugin, logger, pluginPath, resourcesPath } = require("flexdesigner")
+export const pluginJsTemplate = `const { plugin, logger, pluginPath, resourcesPath } = require("@eniac/flexdesigner")
 
 /**
  * Called when current active window changes
