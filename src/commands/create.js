@@ -8,7 +8,9 @@ import {
   rollupConfigTemplate,
   manifestJsonTemplate,
   configJsonTemplate,
-  pluginJsTemplate
+  pluginJsTemplate,
+  counterUITemplate,
+  readmeTemplate,
 } from '../assets/templates.js';
 import { exec } from 'child_process';
 import ora from 'ora';
@@ -39,7 +41,9 @@ export default async function createCommand(answers) {
     createFile(baseDir, 'rollup.config.mjs', rollupConfigTemplate, { uuid });
     createFile(pluginDir, 'manifest.json', manifestJsonTemplate, { name, author, uuid, version, description, repo });
     createFile(pluginDir, 'config.json', configJsonTemplate);
-    createFile(srcDir, 'plugin.js', pluginJsTemplate);
+    createFile(srcDir, 'plugin.js', pluginJsTemplate, { uuid});
+    createFile(path.join(pluginDir, 'ui'), 'counter.vue', counterUITemplate);
+    createFile(baseDir, 'README.md', readmeTemplate, { name, description, author, repo });
 
     await installDependencies(baseDir);
   } catch (err) {

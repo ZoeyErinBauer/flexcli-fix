@@ -189,8 +189,8 @@ plugin
         {
           type: 'input',
           name: 'name',
-          message: 'Plugin name (e.g. "My Plugin"):',
-          default: 'My Plugin'
+          message: 'Plugin name (e.g. "MyPlugin"):',
+          default: 'MyPlugin'
         },
         {
           type: 'input',
