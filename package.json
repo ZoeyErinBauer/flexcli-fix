@@ -1,6 +1,6 @@
 {
   "name": "@eniac/flexcli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "CLI tool for FlexDesigner",
   "bin": {
     "flexcli": "./src/index.js"
