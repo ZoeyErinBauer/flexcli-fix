@@ -67,8 +67,14 @@ export default async function packCommand(wsClient, options) {
 
     archive.pipe(output);
 
-    // Append all files and directories inside the plugin directory
-    archive.directory(pluginDir, false);
+    // Exclude the 'logs' folder via filter
+    archive.directory(pluginDir, false, (file) => {
+      // file.name is the relative path; exclude if it contains the 'logs' folder
+      if (file.name.startsWith(`logs`)) {
+        return false;
+      }
+      return file;
+    });
 
     await archive.finalize();
   } catch (error) {
