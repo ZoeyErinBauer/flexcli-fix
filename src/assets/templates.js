@@ -34,7 +34,7 @@ export const packageJsonTemplate = `{
     "rollup": "^4.0.2"
   },
   "dependencies": {
-    "@eniac/flexdesigner": "^1.0.1",
+    "@eniac/flexdesigner": "^1.0.1"
   }
 }
 `;
