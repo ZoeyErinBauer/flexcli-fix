@@ -16,14 +16,10 @@ export default async function installCommand(wsClient, options) {
     force: options.force,
   }
 
-  try {
-    const response = await wsClient.sendCommand(cmd);
-    if (response.status === 'success') {
-      logger.info(`Install command successful: ${JSON.stringify(response, null, 2)}`);
-    } else {
-      logger.error(`Install command failed: ${JSON.stringify(response, null, 2)}`);
-    }
-  } catch (error) {
-    logger.error(`Error in install command: ${error.message}`);
+  const response = await wsClient.sendCommand(cmd);
+  if (response.status === 'success') {
+    logger.info(`Install command successful: ${JSON.stringify(response, null, 2)}`);
+  } else {
+    logger.error(`Install command failed: ${JSON.stringify(response, null, 2)}`);
   }
 }

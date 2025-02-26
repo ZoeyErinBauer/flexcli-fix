@@ -14,20 +14,13 @@ export default async function unlinkCommand(wsClient, options) {
     uuid,
   }
 
-  try {
-    const response = await wsClient.sendCommand(cmd);
-    if (options.silent) {
-      return;
-    }
-    if (response.status === 'success') {
-      logger.info(`Unlink command successful: ${JSON.stringify(response, null, 2)}`);
-    } else {
-      logger.error(`Unlink command failed: ${JSON.stringify(response, null, 2)}`);
-    }
-  } catch (error) {
-    if (options.silent) {
-      return;
-    }
-    logger.error(`Error in unlink command: ${error.message}`);
+  const response = await wsClient.sendCommand(cmd);
+  if (options.silent) {
+    return;
+  }
+  if (response.status === 'success') {
+    logger.info(`Unlink command successful: ${JSON.stringify(response, null, 2)}`);
+  } else {
+    logger.error(`Unlink command failed: ${JSON.stringify(response, null, 2)}`);
   }
 }

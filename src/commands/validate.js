@@ -22,16 +22,13 @@ export default async function validateCommand(wsClient, options) {
   const manifestFile = path.join(fullPath, 'manifest.json');
 
   if (!fs.existsSync(uiDir)) {
-    logger.error(`Missing ui folder: ${uiDir}`);
-    return false;
+    throw new Error(`Missing ui folder: ${uiDir}`);
   }
   if (!fs.existsSync(manifestFile)) {
-    logger.error(`Missing manifest file: ${manifestFile}`);
-    return false;
+    throw new Error(`Missing manifest file: ${manifestFile}`);
   }
   if (!fs.existsSync(resourcesDir)) {
-    logger.error(`Missing resources folder: ${resourcesDir}`);
-    return false;
+    throw new Error(`Missing resources folder: ${resourcesDir}`);
   }
 
   // 2. Parse and validate manifest.json
@@ -39,21 +36,18 @@ export default async function validateCommand(wsClient, options) {
   try {
     manifest = JSON.parse(fs.readFileSync(manifestFile, 'utf-8'));
   } catch (e) {
-    logger.error(`Failed to parse manifest.json: ${e.message}`);
-    return false;
+    throw new Error(`Failed to parse manifest.json: ${e.message}`);
   }
 
   const validateManifest = ajv.compile(manifestSchema);
   if (!validateManifest(manifest)) {
-    logger.error(`Invalid manifest.json: ${ajv.errorsText(validateManifest.errors)}`);
-    return false;
+    throw new Error(`Invalid manifest.json: ${ajv.errorsText(validateManifest.errors)}`);
   }
 
   // check if entry exists
   const backendJs = path.join(fullPath, manifest.entry);
   if (!fs.existsSync(backendJs)) {
-    logger.error(`Missing entry file: ${backendJs}`);
-    return false;
+    throw new Error(`Missing entry file: ${backendJs}`);
   }
   
   // 3. If manifest contains keyLibrary, validate each key
@@ -63,8 +57,7 @@ export default async function validateCommand(wsClient, options) {
         validateKeyItem(item, manifest);
       });
     } catch (error) {
-      logger.error(`Key validation error: ${error.message}`);
-      return false;
+      throw new Error(`Key validation error: ${error.message}`);
     }
   }
 

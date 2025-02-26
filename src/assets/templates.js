@@ -7,6 +7,7 @@ logs
 .vscode
 .env
 package-lock.json
+{{uuid}}.plugin/backend
 `;
 
 // 模板：package.json
@@ -354,4 +355,44 @@ npm run build
 npm run plugin:pack --path com.eniac.example.plugin
 \`\`\`
   
+`
+
+export const githubCITemplate = `
+name: Pack files and release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm i
+    
+      - name: Install FlexCli
+        run: npm install -g @eniac/flexcli
+
+      - name: Build Plugin
+        run: npm run build
+
+      - name: Pack Plugin
+        run: npm run plugin:pack
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: {{uuid}}.flexplugin
 `

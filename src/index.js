@@ -47,6 +47,7 @@ plugin
       wsClient.close();
     } catch (error) {
       logger.error(`Error executing link command: ${error.message}`);
+      process.exit(1);
     }
   });
 
@@ -63,6 +64,7 @@ plugin
       wsClient.close();
     } catch (error) {
       logger.error(`Error executing restart command: ${error.message}`);
+      process.exit(1);
     }
   });
 
@@ -80,6 +82,7 @@ plugin
       wsClient.close();
     } catch (error) {
       logger.error(`Error executing unlink command: ${error.message}`);
+      process.exit(1);
     }
   });
 
@@ -95,6 +98,7 @@ plugin
       await debugCommand(wsClient, options);
     } catch (error) {
       logger.error(`Error executing debug command: ${error.message}`);
+      process.exit(1);
     }
   });
 
@@ -110,6 +114,7 @@ plugin
       wsClient.close();
     } catch (error) {
       logger.error(`Error executing list command: ${error.message}`);
+      process.exit(1);
     }
   });
 
@@ -128,6 +133,7 @@ plugin
       await packCommand(null, options);
     } catch (error) {
       logger.error(`Error executing pack command: ${error.message}`);
+      process.exit(1);
     }
   });
 
@@ -139,8 +145,7 @@ plugin
   .action(async (options) => {
     try {
       if (!options.path.endsWith('.flexplugin')) {
-        logger.error('Invalid file extension. Please provide a .flexplugin file.');
-        return;
+        throw new Error('Invalid file extension. Please provide a .flexplugin file.');
       }
       const port = program.opts().port;
       const wsClient = new WebSocketClient(port);
@@ -149,6 +154,7 @@ plugin
       wsClient.close();
     } catch (error) {
       logger.error(`Error executing install command: ${error.message}`);
+      process.exit(1);
     }
   });
 
@@ -165,6 +171,7 @@ plugin
       wsClient.close();
     } catch (error) {
       logger.error(`Error executing uninstall command: ${error.message}`);
+      process.exit(1);
     }
   });
 
@@ -177,6 +184,7 @@ plugin
       await validateCommand(null, options);
     } catch (error) {
       logger.error(`Error executing validate command: ${error.message}`);
+      process.exit(1);
     }
   });
 
@@ -219,10 +227,6 @@ plugin
             // only letters, underscores, and dots are allowed
             if (!/^[a-zA-Z._]+$/.test(input)) {
               return 'Invalid UUID. Only letters, underscores, and dots are allowed.';
-            }
-            // not starting with com.
-            if (!input.startsWith('com.')) {
-              return 'Invalid UUID. Must start with "com."';
             }
             // must have 3 domains
             if (input.split('.').length != 3) {
@@ -269,6 +273,7 @@ plugin
       logger.info(`Workspace for plugin "${answers.name}" created successfully.`);
     } catch (error) {
       logger.error(`Error creating plugin workspace: ${error.message}`);
+      process.exit(1);
     }
   });
 

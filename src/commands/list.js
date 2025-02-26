@@ -11,14 +11,10 @@ export default async function listCommand(wsClient) {
     operation: 'list',
   }
 
-  try {
     const response = await wsClient.sendCommand(cmd);
-    if (response.status === 'success') {
-      logger.info(`List command successful: ${JSON.stringify(response, null, 2)}`);
-    } else {
-      logger.error(`List command failed: ${JSON.stringify(response, null, 2)}`);
-    }
-  } catch (error) {
-    logger.error(`Error in list command: ${error.message}`);
+  if (response.status === 'success') {
+    logger.info(`List command successful: ${JSON.stringify(response, null, 2)}`);
+  } else {
+    logger.error(`List command failed: ${JSON.stringify(response, null, 2)}`);
   }
 }

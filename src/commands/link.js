@@ -18,14 +18,10 @@ export default async function linkCommand(wsClient, options) {
     debug: options.debug === 'true',
   }
 
-  try {
-    const response = await wsClient.sendCommand(cmd);
-    if (response.status === 'success') {
-      logger.info(`Link command successful: ${JSON.stringify(response, null, 2)}`);
-    } else {
-      logger.error(`Link command failed: ${JSON.stringify(response, null, 2)}`);
-    }
-  } catch (error) {
-    logger.error(`Error in link command: ${error.message}`);
+  const response = await wsClient.sendCommand(cmd);
+  if (response.status === 'success') {
+    logger.info(`Link command successful: ${JSON.stringify(response, null, 2)}`);
+  } else {
+    logger.error(`Link command failed: ${JSON.stringify(response, null, 2)}`);
   }
 }
