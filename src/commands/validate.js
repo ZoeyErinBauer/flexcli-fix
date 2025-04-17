@@ -4,11 +4,11 @@ import path from 'path';
 import Ajv from 'ajv';
 import logger from '../utils/logger.js';
 
-import manifestSchema from '../assets/manifest_schema.json' assert { type: 'json' };
-import defaultKeySchema from '../assets/defaultkey_schema.json' assert { type: 'json' };
-import stateKeySchema from '../assets/statekey_schema.json' assert { type: 'json' };
-import sliderKeySchema from '../assets/sliderkey_schema.json' assert { type: 'json' };
-import wheelKeySchema from '../assets/wheelkey_schema.json' assert { type: 'json' };
+import manifestSchema from '../assets/manifest_schema.json' with { type: 'json' };
+import defaultKeySchema from '../assets/defaultkey_schema.json' with { type: 'json' };
+import stateKeySchema from '../assets/statekey_schema.json' with { type: 'json' };
+import sliderKeySchema from '../assets/sliderkey_schema.json' with { type: 'json' };
+import wheelKeySchema from '../assets/wheelkey_schema.json' with { type: 'json' };
 
 const ajv = new Ajv();
 

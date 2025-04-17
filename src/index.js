@@ -5,6 +5,9 @@ import { Command } from 'commander';
 import WebSocketClient from './utils/websocket_client.js';
 import inquirer from 'inquirer';
 import logger from './utils/logger.js';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
 import linkCommand from './commands/link.js';
 import restartCommand from './commands/restart.js';
@@ -17,13 +20,50 @@ import uninstallCommand from './commands/uninstall.js';
 import validateCommand from './commands/validate.js';
 import createCommand from './commands/create.js';
 
+// Get port number from user data directory
+function getPortFromFile() {
+  try {
+    let userDataDir;
+    
+    // Determine user data directory based on operating system
+    if (process.platform === 'win32') {
+      userDataDir = path.join(process.env.APPDATA, 'FlexDesigner', 'data', 'temp');
+    } else if (process.platform === 'darwin') {
+      userDataDir = path.join(os.homedir(), 'Library', 'Application Support', 'FlexDesigner', 'data', 'temp');
+    } else {
+      // Linux and other systems
+      userDataDir = path.join(os.homedir(), '.config', 'FlexDesigner', 'data', 'temp');
+    }
+    
+    const portFilePath = path.join(userDataDir, 'plugin_port.txt');
+    
+    if (fs.existsSync(portFilePath)) {
+      const port = fs.readFileSync(portFilePath, 'utf8').trim();
+      // logger.debug(`Port read from file: ${port}`);
+      return port;
+    }
+  } catch (error) {
+    logger.error(`Error reading port file: ${error.message}`);
+  }
+  
+  return '0'; // Return default value if reading fails
+}
+
+// Get actual port number
+function getPort(specifiedPort) {
+  if (specifiedPort === '0') {
+    return getPortFromFile();
+  }
+  return specifiedPort;
+}
+
 const program = new Command();
 
 program
   .version('1.0.0')
-  .option('--port <number>', 'WebSocket server port', '60109');
+  .option('--port <number>', 'WebSocket server port', '0');
 
-// 定义 'plugin' 命令
+// Define 'plugin' command
 const plugin = program.command('plugin').description('Plugin operations');
 
 plugin
@@ -37,7 +77,7 @@ plugin
   .option('--start <start>', 'Start the plugin after linking', 'true')
   .action(async (options) => {
     try {
-      const port = program.opts().port;
+      const port = getPort(program.opts().port);
       const wsClient = new WebSocketClient(port);
       await wsClient.connect();
       if (!options.skipValidate) {
@@ -57,7 +97,7 @@ plugin
   .requiredOption('--uuid <uuid>', 'UUID string')
   .action(async (options) => {
     try {
-      const port = program.opts().port;
+      const port = getPort(program.opts().port);
       const wsClient = new WebSocketClient(port);
       await wsClient.connect();
       await restartCommand(wsClient, options);
@@ -75,7 +115,7 @@ plugin
   .option('--silent', 'Silent mode', false)
   .action(async (options) => {
     try {
-      const port = program.opts().port;
+      const port = getPort(program.opts().port);
       const wsClient = new WebSocketClient(port);
       await wsClient.connect();
       await unlinkCommand(wsClient, options);
@@ -92,7 +132,7 @@ plugin
   .requiredOption('--uuid <uuid>', 'UUID string')
   .action(async (options) => {
     try {
-      const port = program.opts().port;
+      const port = getPort(program.opts().port);
       const wsClient = new WebSocketClient(port);
       await wsClient.connect();
       await debugCommand(wsClient, options);
@@ -107,7 +147,7 @@ plugin
   .description('List all plugins')
   .action(async () => {
     try {
-      const port = program.opts().port;
+      const port = getPort(program.opts().port);
       const wsClient = new WebSocketClient(port);
       await wsClient.connect();
       await listCommand(wsClient);
@@ -126,7 +166,7 @@ plugin
   .option('--skip-validate', 'Skip validation', false)
   .action(async (options) => {
     try {
-      const port = program.opts().port;
+      const port = getPort(program.opts().port);
       if (!options.skipValidate) {
         await validateCommand(null, options);
       }
@@ -147,7 +187,7 @@ plugin
       if (!options.path.endsWith('.flexplugin')) {
         throw new Error('Invalid file extension. Please provide a .flexplugin file.');
       }
-      const port = program.opts().port;
+      const port = getPort(program.opts().port);
       const wsClient = new WebSocketClient(port);
       await wsClient.connect();
       await installCommand(wsClient, options);
@@ -164,7 +204,7 @@ plugin
   .requiredOption('--uuid <uuid>', 'Plugin UUID')
   .action(async (options) => {
     try {
-      const port = program.opts().port;
+      const port = getPort(program.opts().port);
       const wsClient = new WebSocketClient(port);
       await wsClient.connect();
       await uninstallCommand(wsClient, options);
