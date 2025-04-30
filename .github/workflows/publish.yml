@@ -24,8 +24,7 @@ jobs:
       - name: Log in to npm
         uses: actions/setup-node@v3
         with:
-          registry-url: https://registry.npmjs.org/
-          scope: '@zoeybear'
+          registry-url: https://registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
