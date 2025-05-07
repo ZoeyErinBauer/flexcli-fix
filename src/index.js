@@ -16,6 +16,7 @@ import installCommand from './commands/install.js';
 import uninstallCommand from './commands/uninstall.js';
 import validateCommand from './commands/validate.js';
 import createCommand from './commands/create.js';
+import killCommand from './commands/kill.js';
 
 const program = new Command();
 
@@ -270,5 +271,20 @@ plugin
     }
   });
 
+plugin
+  .command('kill')
+  .description('Kill a running plugin')
+  .requiredOption('--uuid <uuid>', 'UUID of the plugin to kill')
+  .action(async (options) => {
+    try {
+      const port = program.opts().port;
+      const wsClient = new WebSocketClient(port);
+      await wsClient.connect();
+      await killCommand(wsClient, options);
+      wsClient.close();
+    } catch (error) {
+      logger.error(`Error executing kill command: ${error.message}`);
+    }
+  });
 
 program.parse(process.argv);
