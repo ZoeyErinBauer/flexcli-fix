@@ -6,6 +6,8 @@ export const gitignoreTemplate = `node_modules
 logs
 .vscode
 .env
+package-lock.json
+{{uuid}}.plugin/backend
 `;
 
 // 模板：package.json
@@ -34,6 +36,7 @@ export const packageJsonTemplate = `{
     "rollup": "^4.0.2"
   },
   "dependencies": {
+    "@eniac/flexdesigner": "^1.0.1"
   }
 }
 `;
@@ -131,11 +134,41 @@ export const manifestJsonTemplate = `{
         "style": {
             "icon": "mdi mdi-puzzle"
         },
-        "children": []
+        "children": [
+          {
+              "title": "$Counter.Title",
+              "tip": "$Counter.Tip",
+              "cid": "{{uuid}}.counter",
+              "config": {
+                  "keyType": "default",
+                  "clickable": true,
+                  "platform": [
+                      "windows",
+                      "mac"
+                  ]
+              },
+              "style": {
+                  "icon": "mdi mdi-gesture-tap-button",
+                  "width": 240
+              },
+              "data": {
+                  "rangeMin": "0",
+                  "rangeMax": "100"
+              }
+          }
+        ]
     },
     "local": {
         "en": {
-            "PluginName": "{{name}}"
+            "PluginName": "{{name}}",
+            "Counter": {
+                "Title": "Tap Counter",
+                "Tip": "Default keys with customizable drawable content",
+                "UI": {
+                    "RangeMin": "Minimum Value",
+                    "RangeMax": "Maximum Value"
+                }
+            }
         }
     }
 }
@@ -145,7 +178,10 @@ export const manifestJsonTemplate = `{
 export const configJsonTemplate = `{}`;
 
 // 模板：plugin.js
-export const pluginJsTemplate = `const { plugin, logger, pluginPath, resourcesPath } = require("flexdesigner")
+export const pluginJsTemplate = `const { plugin, logger, pluginPath, resourcesPath } = require("@eniac/flexdesigner")
+
+// Store key data
+const keyData = {}
 
 /**
  * Called when current active window changes
@@ -199,6 +235,16 @@ plugin.on('device.status', (devices) => {
  */
 plugin.on('plugin.alive', (payload) => {
     logger.info('Plugin alive:', payload)
+    for (let key of payload.keys) {
+      keyData[key.uid] = key
+      if (key.cid === '{{uuid}}.counter') {
+          keyData[key.uid].counter = parseInt(key.data.rangeMin)
+          key.style.showIcon = false
+          key.style.showTitle = true
+          key.title = 'Click Me!'
+          plugin.draw(payload.serialNumber, key, 'draw')
+      }
+    }
 })
 
 
@@ -212,8 +258,141 @@ plugin.on('plugin.alive', (payload) => {
  */
 plugin.on('plugin.data', (payload) => {
     logger.info('Received plugin.data:', payload)
+    const data = payload.data
+    if (data.key.cid === "{{uuid}}.counter") {
+      const key = data.key
+      key.style.showIcon = false
+      key.style.showTitle = true
+      keyData[key.uid].counter++
+      if (keyData[key.uid].counter > parseInt(key.data.rangeMax)) {
+          keyData[key.uid].counter = parseInt(key.data.rangeMin)
+      }
+      key.title = keyData[key.uid].counter.toString()
+      plugin.draw(payload.serialNumber, key, 'draw')
+    }
 })
 
 // Connect to flexdesigner and start the plugin
 plugin.start()
 `;
+
+export const counterUITemplate = `
+<template>
+  <v-container>
+    <v-row>
+      <v-col cols="6">
+        <v-text-field v-model="modelValue.data.rangeMin" :label="$t('Counter.UI.RangeMin')" type="number" hide-details
+          outlined class="mx-2"></v-text-field>
+      </v-col>
+      <v-col cols="6">
+        <v-text-field v-model="modelValue.data.rangeMax" :label="$t('Counter.UI.RangeMax')" type="number" hide-details
+          outlined class="mx-2"></v-text-field>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script>
+export default {
+  props: {
+    modelValue: {
+      type: Object,
+      required: true,
+    },
+  },
+  emits: ['update:modelValue'],
+  data() {
+    return {
+    };
+  },
+  methods: {
+  },
+  mounted() {
+    this.$fd.info("Hello from Counter Plugin");
+  }
+};
+</script>
+
+<style scoped></style>
+`
+
+export const readmeTemplate = `
+# {{name}}
+
+{{description}}
+
+## Installation
+
+
+### **Prerequisites**
+
+- Node.js 18 or later  
+- FlexDesigner v1.0.0 or later  
+- A Flexbar device 
+- Install FlexCLI  
+  \`\`\`
+  npm install -g @eniac/flexcli
+  \`\`\`
+
+### Clone & Setup
+
+\`\`\`
+git clone {{repo}}.git
+cd {{name}}
+npm install
+\`\`\`
+
+## Debug
+
+\`\`\`
+npm run dev
+\`\`\`
+
+## Build & Pack
+
+\`\`\`
+npm run build
+npm run plugin:pack --path com.eniac.example.plugin
+\`\`\`
+  
+`
+
+export const githubCITemplate = `
+name: Pack files and release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm i
+    
+      - name: Install FlexCli
+        run: npm install -g @eniac/flexcli
+
+      - name: Build Plugin
+        run: npm run build
+
+      - name: Pack Plugin
+        run: npm run plugin:pack
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: {{uuid}}.flexplugin
+`

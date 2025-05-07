@@ -13,14 +13,10 @@ export default async function uninstallCommand(wsClient, options) {
     uuid: options.uuid,
   }
 
-  try {
-    const response = await wsClient.sendCommand(cmd);
-    if (response.status === 'success') {
-      logger.info(`Uninstall command successful: ${JSON.stringify(response, null, 2)}`);
-    } else {
-      logger.error(`Uninstall command failed: ${JSON.stringify(response, null, 2)}`);
-    }
-  } catch (error) {
-    logger.error(`Error in uninstall command: ${error.message}`);
+  const response = await wsClient.sendCommand(cmd);
+  if (response.status === 'success') {
+    logger.info(`Uninstall command successful: ${JSON.stringify(response, null, 2)}`);
+  } else {
+    logger.error(`Uninstall command failed: ${JSON.stringify(response, null, 2)}`);
   }
 }

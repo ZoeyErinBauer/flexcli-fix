@@ -1,9 +1,9 @@
 // commands/pack.js
 import fs from 'fs';
 import path from 'path';
-import archiver from 'archiver';  // 用于压缩文件夹
+import archiver from 'archiver'; 
 import logger from '../utils/logger.js';
-import Ajv from 'ajv';  // JSON Schema 验证库
+import Ajv from 'ajv';
 import manifestSchema from '../assets/manifest_schema.json' assert { type: 'json' };
 
 
@@ -24,54 +24,53 @@ export default async function packCommand(wsClient, options) {
   const requiredFile = 'manifest.json';
   
   if (!fs.existsSync(pluginDir)) {
-    logger.error(`Plugin directory ${pluginDir} does not exist.`);
-    return;
+    throw new Error(`Plugin directory ${pluginDir} does not exist.`);
   }
 
   // Validate subdirectories
   const missingDirs = requiredDirs.filter((dir) => !fs.existsSync(path.join(pluginDir, dir)));
   if (missingDirs.length > 0) {
-    logger.error(`Missing required directories: ${missingDirs.join(', ')}`);
-    return;
+    throw new Error(`Missing required directories: ${missingDirs.join(', ')}`);
   }
 
   // Validate manifest.json file
   const manifestPath = path.join(pluginDir, requiredFile);
   if (!fs.existsSync(manifestPath)) {
-    logger.error(`Missing required file: ${requiredFile}`);
-    return;
+    throw new Error(`Missing required file: ${requiredFile}`);
   }
 
   const manifestData = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
   const valid = validateManifest(manifestData);
   if (!valid) {
-    logger.error(`Invalid manifest.json: ${ajv.errorsText(validateManifest.errors)}`);
-    return;
+    throw new Error(`Invalid manifest.json: ${ajv.errorsText(validateManifest.errors)}`);
   }
   
   const zipFilePath = path.join(path.dirname(pluginDir), `${manifestData.uuid}.flexplugin`);
 
   // Compress the plugin directory into a zip file using archiver
-  try {
-    logger.info(`Packing plugin directory: ${pluginDir}`);
-    const output = fs.createWriteStream(zipFilePath);
-    const archive = archiver('zip', { zlib: { level: 9 } });
+  logger.info(`Packing plugin directory: ${pluginDir}`);
+  const output = fs.createWriteStream(zipFilePath);
+  const archive = archiver('zip', { zlib: { level: 9 } });
 
-    output.on('close', () => {
-      logger.info(`Plugin packed successfully to: ${zipFilePath}`);
-    });
+  output.on('close', () => {
+    logger.info(`Plugin packed successfully to: ${zipFilePath}`);
+  });
 
-    archive.on('error', (err) => {
-      logger.error(`Error while packing: ${err.message}`);
-    });
+  archive.on('error', (err) => {
+    logger.error(`Error while packing: ${err.message}`);
+    throw new Error(err);
+  });
 
-    archive.pipe(output);
+  archive.pipe(output);
 
-    // Append all files and directories inside the plugin directory
-    archive.directory(pluginDir, false);
+  // Exclude the 'logs' folder via filter
+  archive.directory(pluginDir, false, (file) => {
+    // file.name is the relative path; exclude if it contains the 'logs' folder
+    if (file.name.startsWith(`logs`)) {
+      return false;
+    }
+    return file;
+  });
 
-    await archive.finalize();
-  } catch (error) {
-    logger.error(`Error during packing: ${error.message}`);
-  }
+  await archive.finalize();
 }

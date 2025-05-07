@@ -1,83 +1,176 @@
+# FlexCLI Tool Documentation
 
-## 安装
+This document provides an overview and guide for using the CLI tool that interacts with plugins and FlexDesigner. The tool provides various commands for managing plugins such as linking, restarting, debugging, installing, and uninstalling plugins. It also supports creating a plugin project and validating the plugin structure.
 
-```bash
-npm install -g flexcli
+## Installation
+
+### Prerequisites
+- Node.js version 18 or higher
+- FlexDesigner version 1.0.0 or higher.
+
+### Setup
+
+Install the FlexDesigner CLI Tool by running the following command.
+
+```
+npm install -g @eniactech/flexcli
 ```
 
-或在本地安装后通过 `npx` 直接调用。
+
+
+## Commands
+
+### `plugin link`
+Links a plugin to the FlexDesigner.
+
+#### Options:
+- `--path <path>`: Path to the plugin directory (required)
+- `--uuid <uuid>`: UUID of the plugin (required)
+- `--debug <debug>`: Enable or disable debug mode (default: false)
+- `--skip-validate`: Skip the validation step (default: false)
+- `--force`: Force override of an existing plugin (default: false)
+- `--start <start>`: Whether to start the plugin after linking (default: true)
+
+#### Description:
+This command links a plugin to the FlexDesigner by specifying its path and UUID. It also provides options to enable debug mode, skip validation, force override, and start the plugin after linking.
 
 ---
 
-## 基本用法
+### `plugin restart`
+Restarts a plugin.
 
-### 命令格式
+#### Options:
+- `--uuid <uuid>`: UUID of the plugin to restart (required)
 
-```bash
-flexcli [全局选项] <command> [命令选项]
-```
-
-- **全局选项**  
-  - `--port <number>`：指定 WebSocket 端口，默认 `60109`。
-
-### 插件操作（`plugin`）
-
-1. **link**  
-   - 用途：链接插件到系统  
-   - 参数：  
-     - `--path <path>`：文件夹路径  
-     - `--uuid <uuid>`：插件 UUID  
-   - 示例：
-     ```bash
-     flexcli plugin link --path /path/to/plugin --uuid 12345
-     ```
-
-2. **restart**  
-   - 用途：重启指定插件  
-   - 参数：  
-     - `--uuid <uuid>`：插件 UUID  
-   - 示例：
-     ```bash
-     flexcli plugin restart --uuid 12345
-     ```
-
-3. **unlink**  
-   - 用途：解除插件链接  
-   - 参数：  
-     - `--uuid <uuid>`：插件 UUID  
-   - 示例：
-     ```bash
-     flexcli plugin unlink --uuid 12345
-     ```
-
-4. **debug**  
-   - 用途：启动插件调试  
-   - 参数：  
-     - `--uuid <uuid>`：插件 UUID  
-   - 示例：
-     ```bash
-     flexcli plugin debug --uuid 12345
-     ```
-   - 执行成功后，命令行会返回一个调试端口号。
-
-5. **list**  
-   - 用途：列出所有插件信息  
-   - 示例：
-     ```bash
-     flexcli plugin list
-     ```
+#### Description:
+This command restarts a plugin using the provided UUID.
 
 ---
 
-## 典型示例
+### `plugin unlink`
+Unlinks a plugin from the FlexDesigner.
+
+#### Options:
+- `--uuid <uuid>`: UUID of the plugin to unlink (required)
+- `--silent`: Run in silent mode without output (default: false)
+
+#### Description:
+This command unlinks a plugin from the FlexDesigner using the specified UUID.
+
+---
+
+### `plugin debug`
+Debugs a plugin.
+
+#### Options:
+- `--uuid <uuid>`: UUID of the plugin to debug (required)
+
+#### Description:
+This command is used to debug a plugin using its UUID. It connects to the plugin and provides debugging information.
+
+---
+
+### `plugin list`
+Lists all the installed plugins.
+
+#### Description:
+This command lists all the plugins currently installed in the FlexDesigner.
+
+---
+
+### `plugin pack`
+Packs a plugin into a `.flexplugin` file.
+
+#### Options:
+- `--path <path>`: Path to the plugin directory (required)
+- `--output <output>`: Output path for the `.flexplugin` file
+- `--skip-validate`: Skip validation (default: false)
+
+#### Description:
+This command packages the plugin into a `.flexplugin` file, with options for specifying the output path and skipping validation.
+
+---
+
+### `plugin install`
+Installs a plugin from a `.flexplugin` file.
+
+#### Options:
+- `--path <path>`: Path to the `.flexplugin` file (required)
+- `--force`: Force the installation (default: false)
+
+#### Description:
+This command installs a plugin using the `.flexplugin` file. If the file extension is not `.flexplugin`, an error will be shown. The `--force` option allows forcing the installation.
+
+---
+
+### `plugin uninstall`
+Uninstalls a plugin.
+
+#### Options:
+- `--uuid <uuid>`: UUID of the plugin to uninstall (required)
+
+#### Description:
+This command uninstalls the plugin using the specified UUID.
+
+---
+
+### `plugin validate`
+Validates the structure and manifest of a plugin.
+
+#### Options:
+- `--path <path>`: Path to the plugin directory (required)
+
+#### Description:
+This command validates the plugin directory and its manifest to ensure that it follows the correct structure.
+
+---
+
+### `plugin create`
+Creates a basic plugin workspace.
+
+#### Description:
+This command creates a basic workspace for a new plugin, allowing you to specify details like the plugin path, name, version, author, description, and repository URL.
+
+It will prompt you for the following information:
+- Plugin path
+- Plugin name
+- Author name
+- Reversed domain UUID (e.g., `com.author.myplugin`)
+- Version (in format `x.y.z`)
+- Description
+- Repository URL
+
+The created workspace will be initialized with the provided information.
+
+---
+
+## General Options
+- `--port <number>`: Specifies the WebSocket server port (default: 60109)
+
+---
+
+## Example Usage
+
+To link a plugin:
 
 ```bash
-# 指定端口 60110，链接插件
-flexcli --port 60110 plugin link --path /path/to/plugin --uuid 12345
+flexcli plugin link --path /path/to/plugin --uuid com.example.plugin --debug true
+```
 
-# 默认端口，重启插件
-flexcli plugin restart --uuid 12345
+To restart a plugin:
 
-# 调试插件
-flexcli plugin debug --uuid 12345
+```bash
+flexcli plugin restart --uuid com.example.plugin
+```
+
+To list all plugins:
+
+```bash
+flexcli plugin list
+```
+
+To create a new plugin workspace:
+
+```bash
+flexcli plugin create
 ```

@@ -14,14 +14,10 @@ export default async function restartCommand(wsClient, options) {
     uuid,
   }
 
-  try {
-    const response = await wsClient.sendCommand(cmd);
-    if (response.status === 'success') {
-      logger.info(`Restart command successful: ${JSON.stringify(response, null, 2)}`);
-    } else {
-      logger.error(`Restart command failed: ${JSON.stringify(response, null, 2)}`);
-    }
-  } catch (error) {
-    logger.error(`Error in restart command: ${error.message}`);
+  const response = await wsClient.sendCommand(cmd);
+  if (response.status === 'success') {
+    logger.info(`Restart command successful: ${JSON.stringify(response, null, 2)}`);
+  } else {
+    logger.error(`Restart command failed: ${JSON.stringify(response, null, 2)}`);
   }
 }

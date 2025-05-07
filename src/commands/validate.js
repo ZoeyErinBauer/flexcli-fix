@@ -4,11 +4,11 @@ import path from 'path';
 import Ajv from 'ajv';
 import logger from '../utils/logger.js';
 
-import manifestSchema from '../assets/manifest_schema.json' assert { type: 'json' };
-import defaultKeySchema from '../assets/defaultkey_schema.json' assert { type: 'json' };
-import stateKeySchema from '../assets/statekey_schema.json' assert { type: 'json' };
-import sliderKeySchema from '../assets/sliderkey_schema.json' assert { type: 'json' };
-import wheelKeySchema from '../assets/wheelkey_schema.json' assert { type: 'json' };
+import manifestSchema from '../assets/manifest_schema.json' with { type: 'json' };
+import defaultKeySchema from '../assets/defaultkey_schema.json' with { type: 'json' };
+import stateKeySchema from '../assets/statekey_schema.json' with { type: 'json' };
+import sliderKeySchema from '../assets/sliderkey_schema.json' with { type: 'json' };
+import wheelKeySchema from '../assets/wheelkey_schema.json' with { type: 'json' };
 
 const ajv = new Ajv();
 
@@ -17,26 +17,18 @@ export default async function validateCommand(wsClient, options) {
   const fullPath = path.resolve(pluginPath);
 
   // 1. Check required files and directories
-  const backendJs = path.join(fullPath, 'backend', 'plugin.js');
   const uiDir = path.join(fullPath, 'ui');
   const resourcesDir = path.join(fullPath, 'resources');
   const manifestFile = path.join(fullPath, 'manifest.json');
 
-  if (!fs.existsSync(backendJs)) {
-    logger.error(`Missing file: ${backendJs}`);
-    return false;
-  }
   if (!fs.existsSync(uiDir)) {
-    logger.error(`Missing folder: ${uiDir}`);
-    return false;
+    throw new Error(`Missing ui folder: ${uiDir}`);
   }
   if (!fs.existsSync(manifestFile)) {
-    logger.error(`Missing file: ${manifestFile}`);
-    return false;
+    throw new Error(`Missing manifest file: ${manifestFile}`);
   }
   if (!fs.existsSync(resourcesDir)) {
-    logger.error(`Missing folder: ${resourcesDir}`);
-    return false;
+    throw new Error(`Missing resources folder: ${resourcesDir}`);
   }
 
   // 2. Parse and validate manifest.json
@@ -44,16 +36,20 @@ export default async function validateCommand(wsClient, options) {
   try {
     manifest = JSON.parse(fs.readFileSync(manifestFile, 'utf-8'));
   } catch (e) {
-    logger.error(`Failed to parse manifest.json: ${e.message}`);
-    return false;
+    throw new Error(`Failed to parse manifest.json: ${e.message}`);
   }
 
   const validateManifest = ajv.compile(manifestSchema);
   if (!validateManifest(manifest)) {
-    logger.error(`Invalid manifest.json: ${ajv.errorsText(validateManifest.errors)}`);
-    return false;
+    throw new Error(`Invalid manifest.json: ${ajv.errorsText(validateManifest.errors)}`);
   }
 
+  // check if entry exists
+  const backendJs = path.join(fullPath, manifest.entry);
+  if (!fs.existsSync(backendJs)) {
+    throw new Error(`Missing entry file: ${backendJs}`);
+  }
+  
   // 3. If manifest contains keyLibrary, validate each key
   if (Array.isArray(manifest.keyLibrary)) {
     try {
@@ -61,8 +57,7 @@ export default async function validateCommand(wsClient, options) {
         validateKeyItem(item, manifest);
       });
     } catch (error) {
-      logger.error(`Key validation error: ${error.message}`);
-      return false;
+      throw new Error(`Key validation error: ${error.message}`);
     }
   }
 

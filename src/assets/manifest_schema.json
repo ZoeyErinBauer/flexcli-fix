@@ -63,7 +63,7 @@
                   "type": "object",
                   "properties": {
                     "path": { "type": "string" },
-                    "win": { "type": "string" }
+                    "win": { "type": "array" }
                   }
                 }
               },
