@@ -1,6 +1,6 @@
 {
   "name": "@zoeybear/flexcli",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "description": "CLI tool for FlexDesigner",
   "bin": {
     "flexcli": "./src/index.js"
